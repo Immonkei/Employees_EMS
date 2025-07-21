@@ -1,202 +1,239 @@
-# 🏥 Healthcare Management System
+# Employee Management System
 
-This is a **desktop application** developed in **Java Swing** for managing core operations within a healthcare facility. It provides functionalities for **patient registration**, **doctor management**, **appointment scheduling**, and **recording medical history**, all backed by a **MySQL database**.
+This is a desktop application developed using Java Swing, designed to streamline the management of employee, department, and payroll data within an organization. It provides an intuitive graphical user interface (GUI) for performing essential CRUD (Create, Read, Update, Delete) operations on these core entities.
 
----
+## ✨ Features
 
-## 🌟 Features
+* **Employee Management:**
+    * Add new employees with detailed personal information (First Name, Last Name, Email, Phone Number, Hire Date, Job Title, Salary).
+    * Assign employees to existing departments.
+    * View a list of all registered employees, including their department name.
+    * Update existing employee details.
+    * Delete employee records.
+    * Table allows sorting by columns.
+    * User-friendly date selection for "Hire Date" using `LGoodDatePicker`.
 
-### 🧍 Patient Management
-- Register new patients with detailed personal information.
-- View a list of all registered patients.
-- Update existing patient details.
-- Delete patient records.
-- **Search** patients by first name, last name, email, or phone number(Future Plan).
+* **Department Management:**
+    * Add new departments with names and locations.
+    * View, update, and delete department records.
+    * Table allows sorting by columns.
 
-### 👨‍⚕️ Doctor Management
-- Add new doctors with specialization and contact information.
-- View, update, and delete doctor records.
+* **Payroll Management:**
+    * Process payroll records for specific employees, including gross salary, deductions, and calculated net salary.
+    * Edit existing payroll entries.
+    * View a list of all payroll records, linked to employee names.
+    * Delete payroll entries.
+    * Table allows sorting by columns.
+    * User-friendly date selection for "Payroll Date" using `LGoodDatePicker`.
 
-### 📅 Appointment Management
-- Schedule appointments linking patients to doctors.
-- View, update, or delete appointments.
-- Modify date, time, reason, and status.
+* **MySQL Integration:**
+    * All data is stored persistently in a MySQL relational database.
 
-### 📋 Medical History Management
-- Record diagnoses, treatments, and notes for patients.
-- Link medical records to patients (and optionally doctors).
-- View, update, and delete medical records.
+* **Modern UI:**
+    * Utilizes `FlatLaf` for a clean, modern, and visually appealing Look and Feel (UI theme).
+    * Consistent header styling and button colors across modules.
+    * Improved form layouts using `GridBagLayout` for better alignment and spacing.
 
-### 🗃️ MySQL Integration
-- All data is stored persistently in a **MySQL relational database**.
+## 🗄️ Project Structure
+Okay, here is the complete content of the README.md file, formatted as a string that you can directly copy and paste into a new README.md file in your GitHub repository.
 
----
+Markdown
 
-## 🛠️ Technologies Used
+# Employee Management System
 
-- **Backend**: Java  
-- **Database**: MySQL  
-- **Connectivity**: JDBC (Java Database Connectivity)  
-- **Frontend**: Java Swing (GUI)  
-- **IDE**: IntelliJ IDEA (recommended)
+This is a desktop application developed using Java Swing, designed to streamline the management of employee, department, and payroll data within an organization. It provides an intuitive graphical user interface (GUI) for performing essential CRUD (Create, Read, Update, Delete) operations on these core entities.
 
----
+## ✨ Features
 
-## 🗄️ Database Setup
+* **Employee Management:**
+    * Add new employees with detailed personal information (First Name, Last Name, Email, Phone Number, Hire Date, Job Title, Salary).
+    * Assign employees to existing departments.
+    * View a list of all registered employees, including their department name.
+    * Update existing employee details.
+    * Delete employee records.
+    * Table allows sorting by columns.
+    * User-friendly date selection for "Hire Date" using `LGoodDatePicker`.
 
-### 1. Install MySQL Server
-Use MySQL Community Server or packages like **XAMPP/WAMP/MAMP**.
+* **Department Management:**
+    * Add new departments with names and locations.
+    * View, update, and delete department records.
+    * Table allows sorting by columns.
 
-### 2. Create the Database
+* **Payroll Management:**
+    * Process payroll records for specific employees, including gross salary, deductions, and calculated net salary.
+    * Edit existing payroll entries.
+    * View a list of all payroll records, linked to employee names.
+    * Delete payroll entries.
+    * Table allows sorting by columns.
+    * User-friendly date selection for "Payroll Date" using `LGoodDatePicker`.
 
-```sql
-CREATE DATABASE healthcare_system_db;
-USE healthcare_system_db;
-```
+* **MySQL Integration:**
+    * All data is stored persistently in a MySQL relational database.
 
-### 3. Create Tables
+* **Modern UI:**
+    * Utilizes `FlatLaf` for a clean, modern, and visually appealing Look and Feel (UI theme).
+    * Consistent header styling and button colors across modules.
+    * Improved form layouts using `GridBagLayout` for better alignment and spacing.
 
-```sql
--- Patients Table
-CREATE TABLE Patients (
-    patient_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    date_of_birth DATE NOT NULL,
-    gender VARCHAR(10),
-    address VARCHAR(255),
-    city VARCHAR(50),
-    state VARCHAR(50),
-    zip_code VARCHAR(10),
-    phone_number VARCHAR(20),
-    email VARCHAR(100) UNIQUE,
-    registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+## 🗄️ Project Structure
 
--- Doctors Table
-CREATE TABLE Doctors (
-    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    specialization VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(20),
-    email VARCHAR(100) UNIQUE
-);
-
--- Appointments Table
-CREATE TABLE Appointments (
-    appointment_id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    appointment_date DATE NOT NULL,
-    appointment_time TIME NOT NULL,
-    reason TEXT,
-    status VARCHAR(20) DEFAULT 'Scheduled',
-    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
-);
-
--- Medical History Table
-CREATE TABLE Medical_History (
-    record_id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    doctor_id INT,
-    record_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    diagnosis TEXT,
-    treatment TEXT,
-    notes TEXT,
-    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
-);
-```
-
----
-
-## 📁 Project Structure
-
-```
-HealthcareManagementSystem/
-├── src/
-│   └── com/
-│       └── healthcare/
-│           ├── model/        // POJOs for DB entities
-│           │   ├── Appointment.java
-│           │   ├── Doctor.java
-│           │   ├── MedicalRecord.java
-│           │   └── Patient.java
-│           ├── dao/          // DAO for CRUD operations
-│           │   ├── AppointmentDAO.java
-│           │   ├── DoctorDAO.java
-│           │   ├── MedicalRecordDAO.java
-│           │   └── PatientDAO.java
-│           ├── ui/           // Swing UI Panels and App
-│           │   ├── AppointmentPanel.java
-│           │   ├── DoctorPanel.java
-│           │   ├── HealthcareApp.java
-│           │   ├── MedicalRecordPanel.java
-│           │   └── PatientPanel.java
-│           ├── util/         // Utilities (DB connection)
-│           │   └── DatabaseConnection.java
-│           └── test/         // Testing Classes
-│               └── HealthcareAppTester.java
+EmployeeManagementSystem/
 ├── lib/
-│   └── mysql-connector-j-x.x.x.jar
-└── HealthcareManagementSystem.iml
-```
+│   ├── mysql-connector-j-X.X.X.jar
+│   ├── LGoodDatePicker-X.X.X.jar
+│   └── flatlaf-X.X.jar
+└── src/
+└── com/
+└── employeemanagement/
+├── database/
+│   └── DatabaseManager.java          // Manages database connections
+│
+├── model/                          // POJOs for DB entities
+│   ├── Department.java
+│   ├── Employee.java
+│   └── Payroll.java
+│
+├── dao/                            // DAO for CRUD operations
+│   ├── DepartmentDAO.java
+│   ├── EmployeeDAO.java
+│   └── PayrollDAO.java
+│
+└── gui/                            // Swing UI Panels and App
+├── MainDashboard.java          // Main application window
+├── DepartmentPanel.java        // UI for Department management
+├── EmployeePanel.java          // UI for Employee management
+└── PayrollPanel.java           // UI for Payroll management
+
+## ⚙️ Technologies Used
+
+* **Backend:** Java
+* **Database:** MySQL
+* **Connectivity:** JDBC (Java Database Connectivity)
+* **Frontend:** Java Swing (GUI)
+* **IDE:** IntelliJ IDEA (recommended)
+* **Libraries:**
+    * MySQL Connector/J
+    * LGoodDatePicker
+    * FlatLaf
+
+## ▶️ Getting Started
+
+### 1. Prerequisites
+
+* **Java JDK 11 or higher** (JDK 21 used during development)
+* **MySQL Server**
+* **IntelliJ IDEA** (or any Java IDE like Eclipse, NetBeans)
+
+### 2. Database Setup
+
+a.  **Install MySQL Server:**
+    Use MySQL Community Server or packages like XAMPP/WAMP/MAMP. Ensure your MySQL server is running.
+
+b.  **Create the Database:**
+    Open your MySQL client (e.g., MySQL Workbench, command line) and execute the following commands to create the database and a dedicated user for the application. Remember to replace `'your_secure_password'` with a strong password.
+
+    ```sql
+    CREATE DATABASE EmployeeManagementDB;
+
+    CREATE USER 'ems_user'@'localhost' IDENTIFIED BY 'your_secure_password';
+
+    GRANT ALL PRIVILEGES ON EmployeeManagementDB.* TO 'ems_user'@'localhost';
+
+    FLUSH PRIVILEGES;
+    ```
+
+c.  **Create Tables:**
+    Switch to the newly created database and execute the table creation SQL statements for `Departments`, `Employees`, and `Payroll`.
+
+    ```sql
+    USE EmployeeManagementDB;
+
+    CREATE TABLE Departments (
+        department_id INT PRIMARY KEY AUTO_INCREMENT,
+        department_name VARCHAR(100) NOT NULL UNIQUE,
+        location VARCHAR(100)
+    );
+
+    CREATE TABLE Employees (
+        employee_id INT PRIMARY KEY AUTO_INCREMENT,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        phone_number VARCHAR(20),
+        hire_date DATE NOT NULL,
+        job_title VARCHAR(50) NOT NULL,
+        salary DECIMAL(10, 2) NOT NULL CHECK (salary >= 0),
+        department_id INT,
+        FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+            ON DELETE SET NULL ON UPDATE CASCADE
+    );
+
+    CREATE TABLE Payroll (
+        payroll_id INT PRIMARY KEY AUTO_INCREMENT,
+        employee_id INT NOT NULL,
+        payroll_date DATE NOT NULL,
+        gross_salary DECIMAL(10, 2) NOT NULL,
+        deductions DECIMAL(10, 2) DEFAULT 0.00,
+        net_salary DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (employee_id) REFERENCES Employees(employee_id)
+            ON DELETE CASCADE ON UPDATE CASCADE
+    );
+    ```
+
+### 3. Project Setup (IDE - IntelliJ IDEA Example)
+
+1.  **Clone or Download the project.**
+
+2.  **Open in IntelliJ IDEA:**
+    * Open IntelliJ IDEA and select `Open` or `Import Project`.
+    * Navigate to the project directory and open it.
+
+3.  **Download External JARs:**
+    * **MySQL Connector/J:** Download `mysql-connector-j-X.X.X.jar` from [MySQL Downloads](https://dev.mysql.com/downloads/connector/j/).
+    * **LGoodDatePicker:** Download `LGoodDatePicker-X.X.X.jar` from [LGoodDatePicker GitHub Releases](https://github.com/LGoodDatePicker/LGoodDatePicker/releases).
+    * **FlatLaf:** Download `flatlaf-X.X.jar` from [FlatLaf GitHub Releases](https://github.com/JFormDesigner/FlatLaf/releases).
+
+4.  **Add JARs to `lib/` directory:**
+    * Manually create a folder named `lib` in the root of your project (if it doesn't exist).
+    * Place all three downloaded `.jar` files into this `lib/` directory.
+
+5.  **Add JARs to Project Library/Module Dependencies in IntelliJ:**
+    * Right-click on your project in the Project Explorer.
+    * Select `Open Module Settings` (or press `F4`).
+    * Go to `Libraries`.
+    * Click the `+` button, select `Java`.
+    * Navigate to your project's `lib/` directory and select all three `.jar` files. Click `OK`.
+    * Ensure they are attached to the correct module. Click `Apply` then `OK`.
+
+6.  **Configure Database Credentials:**
+    Edit `src/com/employeemanagement/database/DatabaseManager.java` and update the `USER` and `PASSWORD` to match your MySQL user's credentials created in step 2b.
+
+    ```java
+    // ...
+    private static final String USER = "ems_user"; // Your MySQL username
+    private static final String PASSWORD = "your_secure_password"; // Your MySQL password
+    // ...
+    ```
+
+7.  **Build the Project:**
+    In IntelliJ: `Build` > `Rebuild Project`.
+
+### 4. Run the App
+
+* Open `src/com/employeemanagement/gui/MainDashboard.java`.
+* Right-click on the file and select `Run 'MainDashboard.main()'`.
 
 ---
 
-## 🚀 Getting Started
+## 📈 Future Enhancements
 
-### ✅ Prerequisites
-- **Java JDK** 8 or higher (JDK 23 used during development)
-- **MySQL Server**
-- **IntelliJ IDEA** (or any Java IDE)
-
----
-
-### 🧰 Steps to Run
-
-1. **Clone or Download** the project.
-
-2. **Open in IntelliJ IDEA.**
-
-3. **Download MySQL JDBC Driver:**
-   - Download from: [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/)
-   - Add `.jar` file to the `lib/` directory.
-
-4. **Add JDBC Driver in IntelliJ:**
-   - `Right-click project` → **Open Module Settings (F4)** → **Libraries** → `+` → **Java** → Select `.jar`
-
-5. **Configure Database Credentials:**
-   Edit `DatabaseConnection.java`:
-   ```java
-   private static final String USER = "root";
-   private static final String PASS = "your_mysql_password";
-   ```
-
-6. **Build the Project:**
-   - In IntelliJ: `Build > Rebuild Project`
-
-7. **Run the App:**
-   - Open `HealthcareApp.java`
-   - Right-click → **Run 'HealthcareApp.main()'**
-
----
-
-## 🧪 Optional: Testing
-
-Run `HealthcareAppTester.java` to verify DAO operations and database connection:
-- It performs CRUD operations and cleans up afterward.
-
----
-
-## 💡 Future Enhancements
-
-- ✅ Improved UI/UX: Validation, date pickers, advanced filters.
-- 🔐 User Authentication: Role-based login (admin, doctor, receptionist).
-- 📊 Reporting: Generate patient/doctor activity reports.
-- ⏰ Conflict Detection: Prevent overlapping appointments.
-- 🧱 MVC Pattern: Better modularity and scalability.
-
----
+* **Improved UI/UX:**
+    * More sophisticated data validation (e.g., email format, phone number patterns).
+    * Advanced filtering and search options for tables.
+    * Export data to CSV/Excel.
+* **User Authentication:** Implement a login system with different user roles (e.g., Admin, HR).
+* **Reporting:** Generate printable reports (e.g., employee list, payroll summaries).
+* **Employee Performance Tracking:** Add modules for performance reviews, goals, etc.
+* **Attendance Tracking:** Implement features for managing employee attendance.
+* **Deployment:** Package the application as a runnable JAR or installer for easier distribution.
+* **MVC Pattern:** Refactor the codebase to strictly adhere to the Model-View-Controller pattern for better modularity and scalability.
