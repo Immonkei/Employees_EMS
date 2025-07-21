@@ -7,6 +7,7 @@ import com.employeemanagement.model.Payroll;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class PayrollPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JButton addButton, editButton, deleteButton;
     private PayrollDAO payrollDAO;
-    private EmployeeDAO employeeDAO; // To fetch employee list for dropdowns
+    private EmployeeDAO employeeDAO;
 
     public PayrollPanel() {
         setLayout(new BorderLayout());
@@ -31,7 +32,19 @@ public class PayrollPanel extends JPanel {
     }
 
     private void initComponents() {
-        // Table setup
+        // --- Header Panel ---
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(new Color(0xE0E0E0)); // Light grey header background
+        headerPanel.setBorder(new EmptyBorder(10, 15, 10, 15)); // Padding
+        JLabel titleLabel = new JLabel("Manage Payroll");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18)); // Bold, larger font
+        titleLabel.setForeground(new Color(0x333333)); // Dark text
+        headerPanel.add(titleLabel);
+        add(headerPanel, BorderLayout.NORTH);
+
+        // --- Table Panel ---
+        JPanel tableWrapperPanel = new JPanel(new BorderLayout());
+        tableWrapperPanel.setBorder(new EmptyBorder(15, 15, 0, 15));
         tableModel = new DefaultTableModel(new Object[]{"ID", "Employee", "Payroll Date", "Gross Salary", "Deductions", "Net Salary"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -39,14 +52,35 @@ public class PayrollPanel extends JPanel {
             }
         };
         payrollTable = new JTable(tableModel);
+        payrollTable.setRowHeight(25); // Slightly taller rows
+        payrollTable.setAutoCreateRowSorter(true); // Enable sorting
         JScrollPane scrollPane = new JScrollPane(payrollTable);
-        add(scrollPane, BorderLayout.CENTER);
+        tableWrapperPanel.add(scrollPane, BorderLayout.CENTER);
+        add(tableWrapperPanel, BorderLayout.CENTER);
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // --- Button Panel ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setBackground(new Color(0xF0F2F5)); // Match main content background
+        buttonPanel.setBorder(new EmptyBorder(0, 15, 15, 15));
+
+        // Styled Buttons
         addButton = new JButton("Add Payroll");
+        addButton.setBackground(new Color(0x4285F4)); // Primary accent color
+        addButton.setForeground(Color.WHITE);
+        addButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        addButton.setFocusPainted(false);
+
         editButton = new JButton("Edit Payroll");
+        editButton.setBackground(new Color(0x4CAF50)); // Green for edit/update
+        editButton.setForeground(Color.WHITE);
+        editButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        editButton.setFocusPainted(false);
+
         deleteButton = new JButton("Delete Payroll");
+        deleteButton.setBackground(new Color(0xF44336)); // Red for delete
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        deleteButton.setFocusPainted(false);
 
         addButton.addActionListener(e -> addPayroll());
         editButton.addActionListener(e -> editPayroll());
@@ -59,13 +93,13 @@ public class PayrollPanel extends JPanel {
     }
 
     private void loadPayrollRecords() {
-        tableModel.setRowCount(0); // Clear existing data
+        tableModel.setRowCount(0);
         try {
             List<Payroll> payrollRecords = payrollDAO.getAllPayrollRecords();
             for (Payroll payroll : payrollRecords) {
                 tableModel.addRow(new Object[]{
                         payroll.getPayrollId(),
-                        payroll.getEmployeeFullName(), // Display employee name
+                        payroll.getEmployeeFullName(),
                         payroll.getPayrollDate(),
                         payroll.getGrossSalary(),
                         payroll.getDeductions(),
@@ -79,12 +113,13 @@ public class PayrollPanel extends JPanel {
     }
 
     private void addPayroll() {
-        // Dropdown for employees
         JComboBox<Employee> employeeComboBox = new JComboBox<>();
-        List<Employee> employees = null;
         try {
-            employees = employeeDAO.getAllEmployees();
-            // Add a default "Select Employee" or "None" option if you want, but for payroll, it should be required
+            List<Employee> employees = employeeDAO.getAllEmployees();
+            if (employees.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No employees found. Please add employees first.", "No Employees", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             for (Employee emp : employees) {
                 employeeComboBox.addItem(emp);
             }
@@ -94,20 +129,39 @@ public class PayrollPanel extends JPanel {
             return;
         }
 
-        DatePicker payrollDateField = new DatePicker(); // LGoodDatePicker
+        DatePicker payrollDateField = new DatePicker();
         JTextField grossSalaryField = new JTextField(10);
-        JTextField deductionsField = new JTextField("0.00", 10); // Default to 0.00
+        JTextField deductionsField = new JTextField("0.00", 10);
 
-        // Panel for inputs
-        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("Employee:"));
-        panel.add(employeeComboBox);
-        panel.add(new JLabel("Payroll Date:"));
-        panel.add(payrollDateField);
-        panel.add(new JLabel("Gross Salary:"));
-        panel.add(grossSalaryField);
-        panel.add(new JLabel("Deductions:"));
-        panel.add(deductionsField);
+        JPanel panel = new JPanel(new GridBagLayout()); // Use GridBagLayout
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5); // Padding
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Make fields fill horizontally
+
+        // Employee
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Employee:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(employeeComboBox, gbc);
+
+        // Payroll Date
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Payroll Date:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(payrollDateField, gbc);
+
+        // Gross Salary
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Gross Salary:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(grossSalaryField, gbc);
+
+        // Deductions
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Deductions:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(deductionsField, gbc);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Add New Payroll Record",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -123,7 +177,7 @@ public class PayrollPanel extends JPanel {
                 LocalDate payrollDate = payrollDateField.getDate();
                 BigDecimal grossSalary = new BigDecimal(grossSalaryField.getText().trim());
                 BigDecimal deductions = new BigDecimal(deductionsField.getText().trim());
-                BigDecimal netSalary = grossSalary.subtract(deductions); // Calculate net salary
+                BigDecimal netSalary = grossSalary.subtract(deductions);
 
                 if (payrollDate == null) {
                     JOptionPane.showMessageDialog(this, "Please select a payroll date.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -134,10 +188,9 @@ public class PayrollPanel extends JPanel {
                     return;
                 }
 
-
                 Payroll newPayroll = new Payroll(employeeId, payrollDate, grossSalary, deductions, netSalary);
                 payrollDAO.addPayroll(newPayroll);
-                loadPayrollRecords(); // Refresh table
+                loadPayrollRecords();
                 JOptionPane.showMessageDialog(this, "Payroll record added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid number format for salary/deductions. Please enter valid numbers.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -170,15 +223,13 @@ public class PayrollPanel extends JPanel {
             return;
         }
 
-        // Dropdown for employees
         JComboBox<Employee> employeeComboBox = new JComboBox<>();
-        List<Employee> employees = null;
         try {
-            employees = employeeDAO.getAllEmployees();
+            List<Employee> employees = employeeDAO.getAllEmployees();
             for (Employee emp : employees) {
                 employeeComboBox.addItem(emp);
                 if (emp.getEmployeeId() == existingPayroll.getEmployeeId()) {
-                    employeeComboBox.setSelectedItem(emp); // Select current employee
+                    employeeComboBox.setSelectedItem(emp);
                 }
             }
         } catch (SQLException e) {
@@ -188,21 +239,45 @@ public class PayrollPanel extends JPanel {
         }
 
         DatePicker payrollDateField = new DatePicker();
-        payrollDateField.setDate(existingPayroll.getPayrollDate()); // Set existing date
+        payrollDateField.setDate(existingPayroll.getPayrollDate());
         JTextField grossSalaryField = new JTextField(existingPayroll.getGrossSalary().toPlainString(), 10);
         JTextField deductionsField = new JTextField(existingPayroll.getDeductions().toPlainString(), 10);
 
-        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("Payroll ID:"));
-        panel.add(new JLabel(String.valueOf(payrollId)));
-        panel.add(new JLabel("Employee:"));
-        panel.add(employeeComboBox);
-        panel.add(new JLabel("Payroll Date:"));
-        panel.add(payrollDateField);
-        panel.add(new JLabel("Gross Salary:"));
-        panel.add(grossSalaryField);
-        panel.add(new JLabel("Deductions:"));
-        panel.add(deductionsField);
+        JPanel panel = new JPanel(new GridBagLayout()); // Use GridBagLayout
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Payroll ID (Display Only)
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Payroll ID:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(new JLabel(String.valueOf(payrollId)), gbc);
+
+        // Employee
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Employee:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(employeeComboBox, gbc);
+
+        // Payroll Date
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Payroll Date:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(payrollDateField, gbc);
+
+        // Gross Salary
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Gross Salary:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(grossSalaryField, gbc);
+
+        // Deductions
+        gbc.gridx = 0; gbc.gridy = 4; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Deductions:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 4; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(deductionsField, gbc);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Payroll Record",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -233,10 +308,10 @@ public class PayrollPanel extends JPanel {
                 existingPayroll.setPayrollDate(payrollDate);
                 existingPayroll.setGrossSalary(grossSalary);
                 existingPayroll.setDeductions(deductions);
-                existingPayroll.setNetSalary(netSalary); // Update calculated net salary
+                existingPayroll.setNetSalary(netSalary);
 
                 payrollDAO.updatePayroll(existingPayroll);
-                loadPayrollRecords(); // Refresh table
+                loadPayrollRecords();
                 JOptionPane.showMessageDialog(this, "Payroll record updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid number format for salary/deductions. Please enter valid numbers.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -255,7 +330,7 @@ public class PayrollPanel extends JPanel {
         }
 
         int payrollId = (int) tableModel.getValueAt(selectedRow, 0);
-        String employeeInfo = (String) tableModel.getValueAt(selectedRow, 1); // Employee name from table
+        String employeeInfo = (String) tableModel.getValueAt(selectedRow, 1);
         LocalDate payrollDate = (LocalDate) tableModel.getValueAt(selectedRow, 2);
 
         int confirm = JOptionPane.showConfirmDialog(this,
@@ -266,7 +341,7 @@ public class PayrollPanel extends JPanel {
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 payrollDAO.deletePayroll(payrollId);
-                loadPayrollRecords(); // Refresh table
+                loadPayrollRecords();
                 JOptionPane.showMessageDialog(this, "Payroll record deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error deleting payroll record: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);

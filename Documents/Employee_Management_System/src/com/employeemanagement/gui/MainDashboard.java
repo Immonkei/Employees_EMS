@@ -2,74 +2,61 @@ package com.employeemanagement.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+// Import FlatLaf
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf; // Or FlatDarkLaf, FlatIntelliJLaf, etc.
 
 public class MainDashboard extends JFrame {
 
     private JTabbedPane tabbedPane;
 
     public MainDashboard() {
-        // Set the title of the JFrame
         setTitle("Employee Management System");
-
-        // Set the default size of the window
-        setSize(900, 650); // Adjusted size to comfortably fit content
-
-        // Set the default close operation (exit application on close)
+        setSize(900, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Center the window on the screen
         setLocationRelativeTo(null);
-
-        // Initialize and set up the components of the dashboard
         initComponents();
     }
 
     private void initComponents() {
-        // Set the layout for the main JFrame to BorderLayout
         setLayout(new BorderLayout());
 
-        // Create a JTabbedPane for navigation between different modules
         tabbedPane = new JTabbedPane();
 
-        // Create instances of each panel and add them as tabs
-        // Make sure these panel classes (EmployeePanel, DepartmentPanel, PayrollPanel)
-        // exist in the com.employeemanagement.gui package and are correctly implemented.
+        // Add a wrapper panel for the tabbed pane to control its background
+        JPanel contentWrapperPanel = new JPanel(new BorderLayout());
+        contentWrapperPanel.setBackground(new Color(0xF0F2F5)); // A light gray background for the main content area
+        contentWrapperPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add some padding around the tabs
+
         tabbedPane.addTab("Employees", new EmployeePanel());
         tabbedPane.addTab("Departments", new DepartmentPanel());
         tabbedPane.addTab("Payroll", new PayrollPanel());
 
-        // Add the tabbed pane to the center of the JFrame
-        add(tabbedPane, BorderLayout.CENTER);
+        contentWrapperPanel.add(tabbedPane, BorderLayout.CENTER);
+        add(contentWrapperPanel, BorderLayout.CENTER); // Add the wrapper panel to the frame
 
-        // Optional: Add a menu bar for common actions like Exit
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         JMenuItem exitItem = new JMenuItem("Exit");
-
-        // Add an ActionListener to the Exit menu item to close the application
         exitItem.addActionListener(e -> System.exit(0));
-
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
-
-        // Set the menu bar for the JFrame
         setJMenuBar(menuBar);
     }
 
     public static void main(String[] args) {
-        // Ensure that Swing GUI updates are performed on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
             try {
-                // Optional: Set the look and feel of the application to the system's default
-                // This makes the application look native to the OS (Windows, macOS, Linux)
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                // Set the FlatLaf Look and Feel
+                FlatLaf.setup( new FlatLightLaf() ); // Using FlatLightLaf for a bright, modern look
+
+                // Optional: You can set some global UI properties here if needed,
+                // but FlatLaf already provides good defaults.
+                // UIManager.put("Button.arc", 10); // Example: rounded buttons
+
             } catch (Exception e) {
-                // Print any exceptions that occur during LookAndFeel setup
                 e.printStackTrace();
             }
-            // Create and make the MainDashboard visible
             new MainDashboard().setVisible(true);
         });
     }

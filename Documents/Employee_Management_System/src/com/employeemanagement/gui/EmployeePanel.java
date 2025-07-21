@@ -7,6 +7,7 @@ import com.employeemanagement.model.Employee;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -31,6 +32,19 @@ public class EmployeePanel extends JPanel {
     }
 
     private void initComponents() {
+        // --- Header Panel ---
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(new Color(0xE0E0E0)); // Light grey header background
+        headerPanel.setBorder(new EmptyBorder(10, 15, 10, 15)); // Padding
+        JLabel titleLabel = new JLabel("Manage Employees");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18)); // Bold, larger font
+        titleLabel.setForeground(new Color(0x333333)); // Dark text
+        headerPanel.add(titleLabel);
+        add(headerPanel, BorderLayout.NORTH);
+
+        // --- Table Panel ---
+        JPanel tableWrapperPanel = new JPanel(new BorderLayout());
+        tableWrapperPanel.setBorder(new EmptyBorder(15, 15, 0, 15));
         tableModel = new DefaultTableModel(new Object[]{"ID", "First Name", "Last Name", "Email", "Phone", "Hire Date", "Job Title", "Salary", "Department"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -38,13 +52,35 @@ public class EmployeePanel extends JPanel {
             }
         };
         employeeTable = new JTable(tableModel);
+        employeeTable.setRowHeight(25); // Slightly taller rows
+        employeeTable.setAutoCreateRowSorter(true); // Enable sorting
         JScrollPane scrollPane = new JScrollPane(employeeTable);
-        add(scrollPane, BorderLayout.CENTER);
+        tableWrapperPanel.add(scrollPane, BorderLayout.CENTER);
+        add(tableWrapperPanel, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // --- Button Panel ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setBackground(new Color(0xF0F2F5)); // Match main content background
+        buttonPanel.setBorder(new EmptyBorder(0, 15, 15, 15));
+
+        // Styled Buttons
         addButton = new JButton("Add Employee");
+        addButton.setBackground(new Color(0x4285F4)); // Primary accent color
+        addButton.setForeground(Color.WHITE);
+        addButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        addButton.setFocusPainted(false);
+
         editButton = new JButton("Edit Employee");
+        editButton.setBackground(new Color(0x4CAF50)); // Green for edit/update
+        editButton.setForeground(Color.WHITE);
+        editButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        editButton.setFocusPainted(false);
+
         deleteButton = new JButton("Delete Employee");
+        deleteButton.setBackground(new Color(0xF44336)); // Red for delete
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        deleteButton.setFocusPainted(false);
 
         addButton.addActionListener(e -> addEmployee());
         editButton.addActionListener(e -> editEmployee());
@@ -89,10 +125,9 @@ public class EmployeePanel extends JPanel {
         JTextField salaryField = new JTextField(10);
 
         JComboBox<Department> departmentComboBox = new JComboBox<>();
-        List<Department> departments = null;
         try {
-            departments = departmentDAO.getAllDepartments();
-            departmentComboBox.addItem(null);
+            List<Department> departments = departmentDAO.getAllDepartments();
+            departmentComboBox.addItem(null); // Option for no department
             for (Department dept : departments) {
                 departmentComboBox.addItem(dept);
             }
@@ -102,24 +137,59 @@ public class EmployeePanel extends JPanel {
             return;
         }
 
-        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("First Name:"));
-        panel.add(firstNameField);
-        panel.add(new JLabel("Last Name:"));
-        panel.add(lastNameField);
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
-        panel.add(new JLabel("Phone Number:"));
-        panel.add(phoneField);
-        panel.add(new JLabel("Hire Date:"));
-        panel.add(hireDateField);
-        panel.add(new JLabel("Job Title:"));
-        panel.add(jobTitleField);
-        panel.add(new JLabel("Salary:"));
-        panel.add(salaryField);
-        panel.add(new JLabel("Department:"));
-        panel.add(departmentComboBox);
+        JPanel panel = new JPanel(new GridBagLayout()); // Use GridBagLayout
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5); // Padding
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Make fields fill horizontally
 
+        // First Name
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("First Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(firstNameField, gbc);
+
+        // Last Name
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Last Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(lastNameField, gbc);
+
+        // Email
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(emailField, gbc);
+
+        // Phone Number
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Phone Number:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(phoneField, gbc);
+
+        // Hire Date
+        gbc.gridx = 0; gbc.gridy = 4; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Hire Date:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 4; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(hireDateField, gbc);
+
+        // Job Title
+        gbc.gridx = 0; gbc.gridy = 5; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Job Title:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 5; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(jobTitleField, gbc);
+
+        // Salary
+        gbc.gridx = 0; gbc.gridy = 6; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Salary:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 6; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(salaryField, gbc);
+
+        // Department
+        gbc.gridx = 0; gbc.gridy = 7; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Department:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 7; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(departmentComboBox, gbc);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Add New Employee",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -186,9 +256,8 @@ public class EmployeePanel extends JPanel {
         JTextField salaryField = new JTextField(existingEmployee.getSalary().toPlainString(), 10);
 
         JComboBox<Department> departmentComboBox = new JComboBox<>();
-        List<Department> departments = null;
         try {
-            departments = departmentDAO.getAllDepartments();
+            List<Department> departments = departmentDAO.getAllDepartments();
             departmentComboBox.addItem(null);
             for (Department dept : departments) {
                 departmentComboBox.addItem(dept);
@@ -202,25 +271,66 @@ public class EmployeePanel extends JPanel {
             return;
         }
 
-        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-        panel.add(new JLabel("Employee ID:"));
-        panel.add(new JLabel(String.valueOf(employeeId)));
-        panel.add(new JLabel("First Name:"));
-        panel.add(firstNameField);
-        panel.add(new JLabel("Last Name:"));
-        panel.add(lastNameField);
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
-        panel.add(new JLabel("Phone Number:"));
-        panel.add(phoneField);
-        panel.add(new JLabel("Hire Date:"));
-        panel.add(hireDateField);
-        panel.add(new JLabel("Job Title:"));
-        panel.add(jobTitleField);
-        panel.add(new JLabel("Salary:"));
-        panel.add(salaryField);
-        panel.add(new JLabel("Department:"));
-        panel.add(departmentComboBox);
+        JPanel panel = new JPanel(new GridBagLayout()); // Use GridBagLayout
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Employee ID (Display Only)
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Employee ID:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(new JLabel(String.valueOf(employeeId)), gbc);
+
+        // First Name
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("First Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(firstNameField, gbc);
+
+        // Last Name
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Last Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(lastNameField, gbc);
+
+        // Email
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(emailField, gbc);
+
+        // Phone Number
+        gbc.gridx = 0; gbc.gridy = 4; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Phone Number:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 4; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(phoneField, gbc);
+
+        // Hire Date
+        gbc.gridx = 0; gbc.gridy = 5; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Hire Date:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 5; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(hireDateField, gbc);
+
+        // Job Title
+        gbc.gridx = 0; gbc.gridy = 6; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Job Title:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 6; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(jobTitleField, gbc);
+
+        // Salary
+        gbc.gridx = 0; gbc.gridy = 7; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Salary:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 7; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(salaryField, gbc);
+
+        // Department
+        gbc.gridx = 0; gbc.gridy = 8; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Department:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 8; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(departmentComboBox, gbc);
+
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Employee",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

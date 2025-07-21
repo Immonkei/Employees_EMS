@@ -4,8 +4,11 @@ import com.employeemanagement.dao.DepartmentDAO;
 import com.employeemanagement.model.Department;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder; // For padding
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,6 +27,20 @@ public class DepartmentPanel extends JPanel {
     }
 
     private void initComponents() {
+        // --- Header Panel ---
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(new Color(0xE0E0E0)); // Light grey header background
+        headerPanel.setBorder(new EmptyBorder(10, 15, 10, 15)); // Padding
+        JLabel titleLabel = new JLabel("Manage Departments");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18)); // Bold, larger font
+        titleLabel.setForeground(new Color(0x333333)); // Dark text
+        headerPanel.add(titleLabel);
+        add(headerPanel, BorderLayout.NORTH);
+
+        // --- Table Panel ---
+        // Adding an empty border around the table for visual spacing
+        JPanel tableWrapperPanel = new JPanel(new BorderLayout());
+        tableWrapperPanel.setBorder(new EmptyBorder(15, 15, 0, 15)); // Top, Left, Bottom, Right padding
         tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Location"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -31,13 +48,35 @@ public class DepartmentPanel extends JPanel {
             }
         };
         departmentTable = new JTable(tableModel);
+        departmentTable.setRowHeight(25); // Slightly taller rows
+        departmentTable.setAutoCreateRowSorter(true); // Enable sorting
         JScrollPane scrollPane = new JScrollPane(departmentTable);
-        add(scrollPane, BorderLayout.CENTER);
+        tableWrapperPanel.add(scrollPane, BorderLayout.CENTER);
+        add(tableWrapperPanel, BorderLayout.CENTER); // Add the wrapper panel to the main panel
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // --- Button Panel ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15)); // Increased spacing
+        buttonPanel.setBackground(new Color(0xF0F2F5)); // Match main content background
+        buttonPanel.setBorder(new EmptyBorder(0, 15, 15, 15)); // Add padding
+
+        // Styled Buttons
         addButton = new JButton("Add Department");
+        addButton.setBackground(new Color(0x4285F4)); // Primary accent color
+        addButton.setForeground(Color.WHITE);
+        addButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        addButton.setFocusPainted(false); // Remove focus border
+
         editButton = new JButton("Edit Department");
+        editButton.setBackground(new Color(0x4CAF50)); // Green for edit/update
+        editButton.setForeground(Color.WHITE);
+        editButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        editButton.setFocusPainted(false);
+
         deleteButton = new JButton("Delete Department");
+        deleteButton.setBackground(new Color(0xF44336)); // Red for delete
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        deleteButton.setFocusPainted(false);
 
         addButton.addActionListener(e -> addDepartment());
         editButton.addActionListener(e -> editDepartment());
@@ -66,11 +105,23 @@ public class DepartmentPanel extends JPanel {
         JTextField nameField = new JTextField(20);
         JTextField locationField = new JTextField(20);
 
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Department Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Location:"));
-        panel.add(locationField);
+        JPanel panel = new JPanel(new GridBagLayout()); // Using GridBagLayout for better alignment
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5); // Padding around components in the form
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Make fields fill horizontally
+
+        // Department Name
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Department Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(nameField, gbc);
+
+        // Location
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Location:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(locationField, gbc);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Add New Department",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -110,12 +161,29 @@ public class DepartmentPanel extends JPanel {
         JTextField nameField = new JTextField(currentName, 20);
         JTextField locationField = new JTextField(currentLocation, 20);
 
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Department ID: " + departmentId));
-        panel.add(new JLabel("Department Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Location:"));
-        panel.add(locationField);
+        JPanel panel = new JPanel(new GridBagLayout()); // Using GridBagLayout
+        panel.setBackground(Color.WHITE); // White background for the form dialog
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 5, 8, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Department ID (Display Only)
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Department ID:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(new JLabel(String.valueOf(departmentId)), gbc);
+
+        // Department Name
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Department Name:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(nameField, gbc);
+
+        // Location
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST; gbc.weightx = 0;
+        panel.add(new JLabel("Location:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST; gbc.weightx = 1;
+        panel.add(locationField, gbc);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Department",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
