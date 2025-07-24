@@ -54,6 +54,10 @@ public class EmployeePanel extends JPanel {
         employeeTable = new JTable(tableModel);
         employeeTable.setRowHeight(25); // Slightly taller rows
         employeeTable.setAutoCreateRowSorter(true); // Enable sorting
+
+        // Disable column reordering here:
+        employeeTable.getTableHeader().setReorderingAllowed(false);
+
         JScrollPane scrollPane = new JScrollPane(employeeTable);
         tableWrapperPanel.add(scrollPane, BorderLayout.CENTER);
         add(tableWrapperPanel, BorderLayout.CENTER);

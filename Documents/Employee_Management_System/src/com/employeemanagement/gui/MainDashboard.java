@@ -11,7 +11,7 @@ public class MainDashboard extends JFrame {
     private JTabbedPane tabbedPane;
 
     public MainDashboard() {
-        setTitle("Employee Management System");
+        setTitle("Management Employee System");
         setSize(900, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -28,8 +28,8 @@ public class MainDashboard extends JFrame {
         contentWrapperPanel.setBackground(new Color(0xF0F2F5)); // A light gray background for the main content area
         contentWrapperPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add some padding around the tabs
 
-        tabbedPane.addTab("Employees", new EmployeePanel());
         tabbedPane.addTab("Departments", new DepartmentPanel());
+        tabbedPane.addTab("Employees", new EmployeePanel());
         tabbedPane.addTab("Payroll", new PayrollPanel());
 
         contentWrapperPanel.add(tabbedPane, BorderLayout.CENTER);
